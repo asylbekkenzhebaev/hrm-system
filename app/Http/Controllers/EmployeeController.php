@@ -8,6 +8,10 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Gender;
 use App\Models\Position;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
@@ -23,21 +27,28 @@ class EmployeeController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      */
-    public function index(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
+    public function index(): View|Factory|Application
     {
-        $employees = Employee::with(['position', 'position.department', 'gender'])->get();
+        $employees = Employee::with(['position', 'position.department', 'gender'])
+            ->filter()
+            ->paginate(request('paginate') ?? 5)
+            ->withQueryString();
 
-        return view('employees.index', compact('employees'));
+        $departments = Department::query()->pluck('name', 'id')->toArray();
+        $positions = Position::query()->pluck('name', 'id')->toArray();
+        $genders = Gender::query()->pluck('name', 'id')->toArray();
+
+        return view('employees.index', compact('departments', 'positions', 'genders', 'employees'));
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      */
-    public function create(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
+    public function create(): View|Factory|Application
     {
         $genders = Gender::all();
         $departments = Department::all();
@@ -48,10 +59,10 @@ class EmployeeController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \App\Http\Requests\StoreEmployeeRequest $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @param StoreEmployeeRequest $request
+     * @return RedirectResponse
      */
-    public function store(StoreEmployeeRequest $request): \Illuminate\Http\RedirectResponse
+    public function store(StoreEmployeeRequest $request): RedirectResponse
     {
         $data = $request->validated();
         $position_id = $data['position_id'];
@@ -62,16 +73,16 @@ class EmployeeController extends Controller
 
         Position::where('id', $position_id)->update(['employee_id' => $employee->id]);
 
-        return redirect()->route('employees.index')->with('status', ['text' => "{$employee->fio} employee successfully created!", 'color' => 'success']);
+        return redirect()->route('employees.index')->with('status', ['text' => "{$employee->fio} сотрудник успешно создан!", 'color' => 'success']);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param \App\Models\Employee $employee
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @param Employee $employee
+     * @return Application|Factory|View
      */
-    public function edit(Employee $employee): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
+    public function edit(Employee $employee): View|Factory|Application
     {
         $genders = Gender::all();
         $departments = Department::all();
@@ -89,11 +100,11 @@ class EmployeeController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \App\Http\Requests\UpdateEmployeeRequest $request
-     * @param \App\Models\Employee $employee
-     * @return \Illuminate\Http\RedirectResponse
+     * @param UpdateEmployeeRequest $request
+     * @param Employee $employee
+     * @return RedirectResponse
      */
-    public function update(UpdateEmployeeRequest $request, Employee $employee): \Illuminate\Http\RedirectResponse
+    public function update(UpdateEmployeeRequest $request, Employee $employee): RedirectResponse
     {
         $data = $request->validated();
         $position_id = $data['position_id'];
@@ -104,21 +115,21 @@ class EmployeeController extends Controller
         Position::where('employee_id', $employee->id)->update(['employee_id' => null]);
         Position::where('id', $position_id)->update(['employee_id' => $employee->id]);
 
-        return redirect()->route('employees.index')->with('status', ['text' => "{$employee->fio} employee successfully updated!", 'color' => 'success']);
+        return redirect()->route('employees.index')->with('status', ['text' => "{$employee->fio} сотрудник успешно обновлен!", 'color' => 'success']);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\Employee $employee
-     * @return \Illuminate\Http\RedirectResponse
+     * @param Employee $employee
+     * @return RedirectResponse
      */
-    public function destroy(Employee $employee): \Illuminate\Http\RedirectResponse
+    public function destroy(Employee $employee): RedirectResponse
     {
         Position::where('employee_id', $employee->id)->update(['employee_id' => null]);
 
         $employee->delete();
 
-        return redirect()->route('employees.index')->with('status', ['text' => "{$employee->fio} employee successfully deleted!", 'color' => 'danger']);
+        return redirect()->route('employees.index')->with('status', ['text' => "{$employee->fio} сотрудник успешно удален!", 'color' => 'danger']);
     }
 }

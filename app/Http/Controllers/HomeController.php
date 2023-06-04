@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use App\Models\Position;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,7 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware(['auth'])->except(['index']);
     }
 
     /**
@@ -24,8 +25,13 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $positions = Position::with('department')->whereNull('employee_id')->get();
+        $positions = Position::with('department')
+            ->filter()
+            ->paginate(request('paginate') ?? 5)
+            ->withQueryString();
 
-        return view('home', compact('positions'));
+        $departments = Department::query()->pluck('name', 'id')->toArray();
+
+        return view('home', compact('departments','positions'));
     }
 }

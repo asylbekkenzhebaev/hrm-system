@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreGenderRequest;
 use App\Http\Requests\UpdateGenderRequest;
 use App\Models\Gender;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class GenderController extends Controller
 {
@@ -20,11 +24,13 @@ class GenderController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      */
-    public function index(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
+    public function index(): View|Factory|Application
     {
-        $genders = Gender::all();
+        $genders = Gender::filter()
+            ->paginate(request('paginate') ?? 5)
+            ->withQueryString();
 
         return view('genders.index', compact('genders'));
     }
@@ -32,9 +38,9 @@ class GenderController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      */
-    public function create(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
+    public function create(): View|Factory|Application
     {
         return view('genders.create');
     }
@@ -42,25 +48,25 @@ class GenderController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \App\Http\Requests\StoreGenderRequest $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @param StoreGenderRequest $request
+     * @return RedirectResponse
      */
-    public function store(StoreGenderRequest $request): \Illuminate\Http\RedirectResponse
+    public function store(StoreGenderRequest $request): RedirectResponse
     {
         $data = $request->validated();
         $gender = new Gender($data);
         $gender->save();
 
-        return redirect()->route('genders.index')->with('status', ['text' => "{$gender->name} gender successfully created!", 'color' => 'success']);
+        return redirect()->route('genders.index')->with('status', ['text' => "{$gender->name} пол успешно создан!", 'color' => 'success']);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param \App\Models\Gender $gender
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @param Gender $gender
+     * @return Application|Factory|View
      */
-    public function edit(Gender $gender): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
+    public function edit(Gender $gender): View|Factory|Application
     {
         return view('genders.edit', compact('gender'));
     }
@@ -68,28 +74,28 @@ class GenderController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \App\Http\Requests\UpdateGenderRequest $request
-     * @param \App\Models\Gender $gender
-     * @return \Illuminate\Http\RedirectResponse
+     * @param UpdateGenderRequest $request
+     * @param Gender $gender
+     * @return RedirectResponse
      */
-    public function update(UpdateGenderRequest $request, Gender $gender): \Illuminate\Http\RedirectResponse
+    public function update(UpdateGenderRequest $request, Gender $gender): RedirectResponse
     {
         $data = $request->validated();
         $gender->update($data);
 
-        return redirect()->route('genders.index')->with('status', ['text' => "{$gender->name} gender successfully updated!", 'color' => 'success']);
+        return redirect()->route('genders.index')->with('status', ['text' => "{$gender->name} пол успешно обновлен!", 'color' => 'success']);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\Gender $gender
-     * @return \Illuminate\Http\RedirectResponse
+     * @param Gender $gender
+     * @return RedirectResponse
      */
-    public function destroy(Gender $gender): \Illuminate\Http\RedirectResponse
+    public function destroy(Gender $gender): RedirectResponse
     {
         $gender->delete();
 
-        return redirect()->route('genders.index')->with('status', ['text' => "{$gender->name} gender successfully deleted!", 'color' => 'danger']);
+        return redirect()->route('genders.index')->with('status', ['text' => "{$gender->name} пол успешно удален!", 'color' => 'danger']);
     }
 }

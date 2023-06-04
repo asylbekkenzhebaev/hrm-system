@@ -28,4 +28,20 @@ class StorePositionRequest extends FormRequest
             'department_id' => ['required', 'exists:departments,id']
         ];
     }
+
+
+    /**
+     * @return string[]
+     */
+    public function messages()
+    {
+        return [
+            'name.required' => 'Имя не может быть пустым.',
+            'name.min' => 'Имя должно быть не менее 3 символов.',
+            'name.max' => 'Имя должно быть не более 100 символов.',
+            'name.unique' => 'Имя уже занято.',
+            'department_id.required' => 'Отдел не может быть пустым.',
+            'department_id.exists' => 'Выбранный идентификатор отдела недействителен.'
+        ];
+    }
 }

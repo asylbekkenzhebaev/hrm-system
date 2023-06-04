@@ -27,4 +27,17 @@ class UpdateDepartmentRequest extends FormRequest
             'name' => ['required', 'min:3', 'max:100', 'unique:departments,name,' . $this->department->id]
         ];
     }
+
+    /**
+     * @return string[]
+     */
+    public function messages()
+    {
+        return [
+            'required' => 'Имя не может быть пустым.',
+            'min' => 'Имя должно быть не менее 3 символов.',
+            'max' => 'Имя должно быть не более 100 символов.',
+            'unique' => 'Имя уже занято.'
+        ];
+    }
 }

@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">Create a new position</div>
+                <div class="card-header">Создать новую должность</div>
 
                 <div class="card-body">
                     <form method="POST" action="{{ route('positions.store') }}">
@@ -13,13 +13,13 @@
 
                         <div class="row mb-3">
                             <label for="department"
-                                   class="col-md-4 col-form-label text-md-end">{{ __('Department') }}</label>
+                                   class="col-md-4 col-form-label text-md-end">Отдел</label>
 
                             <div class="col-md-6">
                                 <select id="department" name="department_id"
                                         class="form-select @error('department_id') is-invalid @enderror" required
                                         autocomplete="department">
-                                    <option value="0">Select department</option>
+                                    <option value="0">Выбрать отдел</option>
                                     @foreach($departments as $department)
                                         <option
                                             value="{{ $department->id }}" {{ old('department_id') == $department->id ? "selected" : "" }}>{{ $department->name }}</option>
@@ -35,7 +35,7 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="name" class="col-md-4 col-form-label text-md-end">{{ __('Name') }}</label>
+                            <label for="name" class="col-md-4 col-form-label text-md-end">Название</label>
 
                             <div class="col-md-6">
                                 <input id="name" type="text" class="form-control @error('name') is-invalid @enderror"
@@ -52,7 +52,7 @@
                         <div class="row mb-0">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
-                                    {{ __('Create') }}
+                                    Создать
                                 </button>
                             </div>
                         </div>
