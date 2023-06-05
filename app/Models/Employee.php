@@ -48,8 +48,8 @@ class Employee extends Model
             $q->where("{$this->getTable()}.id", '=', request('id'));
         });
 
-        $query->when(request('name'), function (Builder $q) {
-            $q->where("{$this->getTable()}.name", 'LIKE', '%' . request('name') . '%');
+        $query->when(request('fio'), function (Builder $q) {
+            $q->where("{$this->getTable()}.fio", 'LIKE', '%' . request('fio') . '%');
         });
 
         $departmentEmployees = DB::table('positions')
